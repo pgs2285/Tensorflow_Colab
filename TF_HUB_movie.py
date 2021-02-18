@@ -14,4 +14,26 @@ train_data, validation_data, test_data = tfds.load(
     split=('train[:60%]', 'train[60%:]', 'test'),
     as_supervised=True)
 
-train_examples_batch, train_labels_batch = next(iter(train_data.batch(10)))# batch 는 주어진 크기로 데이터 세트를 자동으로 처리
+train_examples_batch, train_labels_batch = next(iter(train_data.batch(10)))# batch 는 주어진 크기로 데이터 세트를 자동으로 처리 , iter은 두번째 인자가 나올때까지 반복 , next는 다음것 가져요기
+
+embedding = "https://tfhub.dev/google/tf2-preview/gnews-swivel-20dim/1" #사전 훈련된 텍스트 임베딩 모델
+hub_layer = hub.KerasLayer(embedding, input_shape = [], dtype = tf.string, trainable = True)
+hub_layer(train_examples_batch[:3])
+
+model = tf.keras.Sequential()
+model.add(hub_layer)
+model.add(tf.keras.layers.Dense(16, activation = 'relu'))
+model.add(tf.keras.layers.Dense(1))
+
+model.summary()
+
+model.compile(optimizer = 'adam', loss = tf.keras.losses.BinaryCrossentropy(from_logits= True), metrics = ['accuracy']) #결과가 0또는 1인 이진으로 나오므로 binarycrossentropy사용
+
+history = model.fit(train_data.shuffle(10000).batch(512),
+                    epochs=20,
+                    validation_data=validation_data.batch(512),
+                    verbose=1)
+
+results = model.evaluate(test_data.batch(512), verbose=2)
+
+

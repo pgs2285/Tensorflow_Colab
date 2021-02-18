@@ -32,11 +32,10 @@ padding ='post',
 maxlen = 256)
 vocab_size = 10000
 model = keras.Sequential()
-model.add(keras.layers.Embedding(vocab_size, 16, input_shape=(None,)))
-model.add(keras.layers.GlobalAveragePooling1D())
-model.add(keras.layers.Dense(16, activation='relu'))
-model.add(keras.layers.Dense(1, activation='sigmoid'))
-
+model.add(keras.layers.Embedding(vocab_size, 16, input_shape=(None,))) #임베딩 벡터의 크기는 16 즉, 10000개의 단어에 대한 임베딩 벡터 10000개만듬
+model.add(keras.layers.GlobalAveragePooling1D()) # 고정된 크기의 출력벡터를 리턴, 압력shape(25000,256,16)배열 사용, 두번째 차원 방향으로 평균을 구하여 (25000, 16)배열 생성
+model.add(keras.layers.Dense(16, activation='relu'))#16개의 뉴런에 입력백터 출력 ,크기 16배열 리턴
+model.add(keras.layers.Dense(1, activation='sigmoid'))# 하나의 노드로 구성된 출력 레이어에 fully connected
 model.summary()
 
 model.compile(optimizer = 'adam',
